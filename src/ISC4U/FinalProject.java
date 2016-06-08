@@ -133,7 +133,7 @@ public class FinalProject extends JApplet implements ActionListener, KeyListener
             myPic.drawString("Correct: " + correct, getWidth() / 6 - (myPic.getFontMetrics().stringWidth("Correct: " + correct) / 2), 542);
             myPic.drawString("Tries: " + tries, getWidth() / 6 - (myPic.getFontMetrics().stringWidth("Tries: " + tries) / 2), 562);
             if (tries > 0) {
-                double per = correct * (1 / tries);
+                double per = correct / tries;
                 myPic.drawString("Percent Correct: " + per * 100 + "%", getWidth() / 6 - (myPic.getFontMetrics().stringWidth("Percent Correct: " + (100)) / 2), 582);
             }
         } else if (mode == 2) {
