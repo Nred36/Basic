@@ -37,13 +37,18 @@ public class FinalProject extends JApplet implements ActionListener, KeyListener
     Image dbImage, master;
     private Graphics dbg;
     Timer timer;
-    int x, y, mode = 0;
-    String[] picz = new String[5];
-    Image[] in = new Image[5];
-    int[][] count = new int[10][2];
+    int mode = 0;
+    String[] picz = new String[7];
+    Image[] in = new Image[7];
     int num = 6, pic = (int) Math.ceil(Math.random()), w, h;
     BufferedImage img[] = new BufferedImage[num * num];
+
+    int rnd;
+    String dis = "";
+
     int crnd = (int) Math.ceil(Math.random() * 9);
+    int[][] count = new int[10][2];
+    int correct = 0, tries = 0;
 
     public FinalProject() {//program name
 
@@ -115,15 +120,25 @@ public class FinalProject extends JApplet implements ActionListener, KeyListener
             myPic.drawRect(240, 276, 54, 20);
 
         } else if (mode == 1) {
-            myPic.drawString("Counting", getWidth() / 2 - myPic.getFontMetrics().stringWidth("Counting"), 92);
+            myPic.setFont(new Font("Dialog", Font.PLAIN, 30));
+            myPic.drawString("Counting", getWidth() / 2 - (myPic.getFontMetrics().stringWidth("Counting") / 2), 42);
 
             for (int i = 0; i < crnd; i++) {
-                myPic.drawRect(count[i][0], count[i][1], 50, 50);
+                myPic.drawImage(in[rnd], count[i][0], count[i][1], 75, 75, null);
+            }
+
+            myPic.drawString(dis, getWidth() / 2 - (myPic.getFontMetrics().stringWidth(dis) / 2), 542);
+
+            myPic.setFont(new Font("Dialog", Font.PLAIN, 15));
+            myPic.drawString("Correct: " + correct, getWidth() / 6 - (myPic.getFontMetrics().stringWidth("Correct: " + correct) / 2), 542);
+            myPic.drawString("Tries: " + tries, getWidth() / 6 - (myPic.getFontMetrics().stringWidth("Tries: " + tries) / 2), 562);
+            if (tries > 0) {
+                double per = correct * (1 / tries);
+                myPic.drawString("Percent Correct: " + per * 100 + "%", getWidth() / 6 - (myPic.getFontMetrics().stringWidth("Percent Correct: " + (100)) / 2), 582);
             }
         } else if (mode == 2) {
 
-        } else if (mode
-                == 3) {
+        } else if (mode == 3) {
             int c = 0;
             for (int y = 0; y < num; y++) {
                 for (int x = 0; x < num; x++) {
@@ -149,15 +164,13 @@ public class FinalProject extends JApplet implements ActionListener, KeyListener
 
     public void counting() {
         int tempx, tempy;
-        System.out.println(crnd);
         for (int i = 0; i < crnd; i++) {
-            tempx = (int) Math.ceil(Math.random() * (getWidth() - 90));
-            tempy = (int) Math.ceil(Math.random() * (getHeight() - 140) + 70);
-            Rectangle r = new Rectangle(tempx, tempy, 70, 70);
+            tempx = (int) Math.ceil(Math.random() * (getWidth() - 120) + 20);
+            tempy = (int) Math.ceil(Math.random() * (getHeight() - 160) + 50);
+            Rectangle r = new Rectangle(tempx, tempy, 100, 100);
             int t = 0;
             for (int c = 0; c < i; c++) {
-                if (r.intersects(count[c][0], count[c][1], 70, 70)) {
-                    System.out.println("DD");
+                if (r.intersects(count[c][0], count[c][1], 100, 100)) {
                     t = 123;
                     c = 123;
                 } else {
@@ -184,10 +197,20 @@ public class FinalProject extends JApplet implements ActionListener, KeyListener
     @Override
     public void keyTyped(KeyEvent e) {
         if (mode == 1) {
-            if (e.getKeyChar() == '1' || e.getKeyChar() == '2' || e.getKeyChar() == '3' || e.getKeyChar() == '4' || e.getKeyChar() == '5' || e.getKeyChar() == '1' || e.getKeyChar() == '6' || e.getKeyChar() == '7' || e.getKeyChar() == '8' || e.getKeyChar() == '9') {
+            if ((e.getKeyChar() == '1' || e.getKeyChar() == '2' || e.getKeyChar() == '3' || e.getKeyChar() == '4' || e.getKeyChar() == '5' || e.getKeyChar() == '1' || e.getKeyChar() == '6' || e.getKeyChar() == '7' || e.getKeyChar() == '8' || e.getKeyChar() == '9') && !dis.equals("Correct")) {
                 if (crnd == Integer.parseInt(String.valueOf(e.getKeyChar()))) {
-                    System.out.println("Correct");
+                    dis = "Correct";
+                    tries++;
+                    correct++;
+                } else {
+                    dis = "Incorrect";
+                    tries++;
                 }
+            } else if (dis.equals("Correct")) {
+                dis = "";
+                crnd = (int) Math.ceil(Math.random() * 9);
+                rnd = (int) Math.ceil(Math.random() * 2 + 4);
+                counting();
             }
         }
     }
@@ -211,12 +234,13 @@ public class FinalProject extends JApplet implements ActionListener, KeyListener
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed(MouseEvent e
+    ) {
         Rectangle m = new Rectangle(e.getX(), e.getY());
         Rectangle b1 = new Rectangle(240, 276, 54, 20);
-        if (m.intersects(b1)) {
+        if (mode == 0 && m.intersects(b1)) {
             mode = 1;
-
+            rnd = (int) Math.ceil(Math.random() * 2 + 4);
             counting();
         }
     }
