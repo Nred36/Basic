@@ -22,6 +22,8 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import javax.swing.ImageIcon;
 import javax.swing.JApplet;
 import javax.swing.JFrame;
@@ -40,13 +42,13 @@ public class FinalProject extends JApplet implements ActionListener, KeyListener
     int mode = 0;
     String[] picz = new String[7];
     Image[] in = new Image[7];
-    int num = 6, pic = (int) Math.ceil(Math.random()), w, h;
+    int num = 3, pic = (int) Math.ceil(Math.random()), w, h;
     BufferedImage img[] = new BufferedImage[num * num];
 
-    int rnd;
+    int rnd, last = 99;
     String dis = "";
 
-    int crnd = (int) Math.ceil(Math.random() * 9);
+    int crnd = (int) Math.ceil(Math.random() * 10);
     int[][] count = new int[10][2];
     int correct = 0, tries = 0;
 
@@ -113,12 +115,13 @@ public class FinalProject extends JApplet implements ActionListener, KeyListener
 
         if (mode == 0) {
             myPic.setFont(new Font("Dialog", Font.PLAIN, 15));
-            myPic.drawString("Game 1", 242, 292);
-            myPic.drawString("Game 2", getWidth() / 2 - myPic.getFontMetrics().stringWidth("Game 2"), 292);
-            myPic.drawString("Game 3", getWidth() - getWidth() / 4 - myPic.getFontMetrics().stringWidth("Game 3"), 292);
+            myPic.drawString("Game 1", getWidth() / 4 - (myPic.getFontMetrics().stringWidth("Game 1")) / 2, 292);
+            myPic.drawString("Game 2", getWidth() / 2 - (myPic.getFontMetrics().stringWidth("Game 2")) / 2, 292);
+            myPic.drawString("Game 3", getWidth() - getWidth() / 4 - (myPic.getFontMetrics().stringWidth("Game 3")) / 2, 292);
 
-            myPic.drawRect(240, 276, 54, 20);
-
+            myPic.drawRect(getWidth() / 4 - (myPic.getFontMetrics().stringWidth("Game 1")) / 2 - 2, 276, 54, 20);
+            myPic.drawRect(getWidth() / 2 - (myPic.getFontMetrics().stringWidth("Game 2")) / 2 - 2, 276, 56, 20);
+            myPic.drawRect(getWidth() - getWidth() / 4 - (myPic.getFontMetrics().stringWidth("Game 3")) / 2 - 2, 276, 56, 20);
         } else if (mode == 1) {
             myPic.setFont(new Font("Dialog", Font.PLAIN, 30));
             myPic.drawString("Counting", getWidth() / 2 - (myPic.getFontMetrics().stringWidth("Counting") / 2), 42);
@@ -133,17 +136,18 @@ public class FinalProject extends JApplet implements ActionListener, KeyListener
             myPic.drawString("Correct: " + correct, getWidth() / 6 - (myPic.getFontMetrics().stringWidth("Correct: " + correct) / 2), 542);
             myPic.drawString("Tries: " + tries, getWidth() / 6 - (myPic.getFontMetrics().stringWidth("Tries: " + tries) / 2), 562);
             if (tries > 0) {
-                double per = correct / tries;
-                myPic.drawString("Percent Correct: " + per * 100 + "%", getWidth() / 6 - (myPic.getFontMetrics().stringWidth("Percent Correct: " + (100)) / 2), 582);
+                myPic.drawString("Percent Correct: " + Math.round((double) correct / tries * 100) + "%", getWidth() / 6 - (myPic.getFontMetrics().stringWidth("Percent Correct: " + (100)) / 2), 582);
             }
         } else if (mode == 2) {
 
         } else if (mode == 3) {
+            myPic.fillRect(0, 0, getWidth(), getHeight());
             int c = 0;
             for (int y = 0; y < num; y++) {
                 for (int x = 0; x < num; x++) {
                     myPic.drawImage(img[c++], w * x + x, h * y + y, null);
                 }
+
             }
         }
     }
@@ -151,14 +155,21 @@ public class FinalProject extends JApplet implements ActionListener, KeyListener
     public void split() {
         w = in[pic].getWidth(null) / num;
         h = in[pic].getHeight(null) / num;
-        int c = 0;
+        int n = 0;
         for (int x = 0; x < num; x++) {
             for (int y = 0; y < num; y++) {
-                img[c] = new BufferedImage(w, h, 5);
-                Graphics2D gr = img[c++].createGraphics();
+                img[n] = new BufferedImage(w, h, 5);
+                Graphics2D gr = img[n++].createGraphics();
                 gr.drawImage(in[pic], 0, 0, w, h, w * y, h * x, w * y + w, h * x + h, null);
                 gr.dispose();
             }
+        }
+        Random rnd = ThreadLocalRandom.current();
+        for (int i = img.length - 1; i > 0; i--) {
+            int index = rnd.nextInt(i + 1);            
+            BufferedImage a = img[index];
+            img[index] = img[i];
+            img[i] = a;
         }
     }
 
@@ -196,12 +207,22 @@ public class FinalProject extends JApplet implements ActionListener, KeyListener
 
     @Override
     public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        System.out.println(e.getKeyChar());
         if (mode == 1) {
-            if ((e.getKeyChar() == '1' || e.getKeyChar() == '2' || e.getKeyChar() == '3' || e.getKeyChar() == '4' || e.getKeyChar() == '5' || e.getKeyChar() == '1' || e.getKeyChar() == '6' || e.getKeyChar() == '7' || e.getKeyChar() == '8' || e.getKeyChar() == '9') && !dis.equals("Correct")) {
-                if (crnd == Integer.parseInt(String.valueOf(e.getKeyChar()))) {
+            if ((e.getKeyChar() == '0' || e.getKeyChar() == '1' || e.getKeyChar() == '2' || e.getKeyChar() == '3' || e.getKeyChar() == '4' || e.getKeyChar() == '5' || e.getKeyChar() == '6' || e.getKeyChar() == '7' || e.getKeyChar() == '8' || e.getKeyChar() == '9') && !dis.equals("Correct")) {
+                if (crnd == Integer.parseInt(String.valueOf(e.getKeyChar())) || (crnd == last * 10)) {
                     dis = "Correct";
                     tries++;
                     correct++;
+                    last = 99;
+                } else if (e.getKeyChar() == '1' || e.getKeyChar() == '2') {
+                    last = Integer.parseInt(String.valueOf(e.getKeyChar()));
+
                 } else {
                     dis = "Incorrect";
                     tries++;
@@ -213,12 +234,6 @@ public class FinalProject extends JApplet implements ActionListener, KeyListener
                 counting();
             }
         }
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e
-    ) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -236,12 +251,19 @@ public class FinalProject extends JApplet implements ActionListener, KeyListener
     @Override
     public void mousePressed(MouseEvent e
     ) {
-        Rectangle m = new Rectangle(e.getX(), e.getY());
-        Rectangle b1 = new Rectangle(240, 276, 54, 20);
+        Rectangle m = new Rectangle(e.getX(), e.getY(), 1, 1);
+        Rectangle b1 = new Rectangle(getWidth() / 4 - (myPic.getFontMetrics().stringWidth("Game 1")) / 2 - 2, 276, 54, 20);
+        Rectangle b2 = new Rectangle(getWidth() / 2 - (myPic.getFontMetrics().stringWidth("Game 2")) / 2 - 2, 276, 56, 20);
+        Rectangle b3 = new Rectangle(getWidth() - getWidth() / 4 - (myPic.getFontMetrics().stringWidth("Game 3")) / 2 - 2, 276, 56, 20);
         if (mode == 0 && m.intersects(b1)) {
             mode = 1;
             rnd = (int) Math.ceil(Math.random() * 2 + 4);
             counting();
+        } else if (mode == 0 && m.intersects(b2)) {
+            mode = 2;
+        } else if (mode == 0 && m.intersects(b3)) {
+            mode = 3;
+            split();
         }
     }
 
